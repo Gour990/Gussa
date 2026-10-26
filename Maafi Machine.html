@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maafi Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffd9ec;--ink:#2b1033;--card:#fff3fa;--accent:#ffc83d;--yes:#12a89d;--no:#ff6b6b;
+background:var(--bg);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#240b2e;--ink:#ffe8f4;--card:#3a1648;--yes:#1fc7ba;--no:#ff7a7a}}
+:root[data-theme="dark"]{--bg:#240b2e;--ink:#ffe8f4;--card:#3a1648;--yes:#1fc7ba;--no:#ff7a7a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:500;line-height:1.35}
+main{max-width:520px;margin:0 auto;padding:22px 18px 40px}
+h1{font-size:clamp(2.1rem,9vw,3.1rem);font-weight:800;line-height:1.02;margin:6px 0 8px}
+.sub{margin:0 0 18px;font-size:1.05rem}
+.box{background:var(--card);border:3px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink);padding:16px}
+.top{display:flex;align-items:center;gap:14px}
+.face{font-size:3.4rem;line-height:1}
+.pct{font-size:1.9rem;font-weight:800;line-height:1}
+.cap{font-weight:700}
+.bar{height:22px;border:3px solid var(--ink);border-radius:99px;overflow:hidden;margin:12px 0}
+.fill{height:100%;width:100%;background:hsl(0 80% 50%);transition:width .45s ease,background .45s ease}
+.say{min-height:3.1em;margin:0;font-weight:700}
+h2{font-size:1.4rem;font-weight:800;margin:26px 0 10px}
+.offers{display:grid;gap:10px}
+button{font:inherit;color:var(--ink);cursor:pointer}
+.offer{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font-weight:700;font-size:1.05rem;background:var(--accent);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;box-shadow:4px 4px 0 var(--ink)}
+.offer:active:not(:disabled){transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.offer:disabled{opacity:.55;box-shadow:none;transform:translate(4px,4px);cursor:default}
+.offer:disabled span:last-child{text-decoration:line-through}
+.offer .e{font-size:1.5rem}
+.choices{position:relative;min-height:150px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.yes,.no{font-weight:800;font-size:1.15rem;border:3px solid var(--ink);border-radius:16px;padding:12px 18px;box-shadow:4px 4px 0 var(--ink)}
+.yes{background:var(--yes)}
+.no{background:var(--no);transition:left .12s ease,top .12s ease}
+.sign{margin-top:22px;text-align:right;font-weight:700}
+.again{margin-top:14px;background:none;border:0;text-decoration:underline;font-weight:700}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.ov{position:fixed;inset:0;background:rgba(43,16,51,.88);display:grid;place-items:center;padding:20px;z-index:5;overflow:hidden}
+.ov[hidden]{display:none}
+.ov .box{text-align:center;max-width:420px;position:relative;z-index:2}
+.ov h2{font-size:2rem;margin:0 0 6px}
+.drop{position:fixed;top:-3rem;font-size:1.9rem;animation:fall linear forwards;z-index:1}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.fill,.no{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Maafi Machine 🙏</h1>
+  <p class="sub">Gussa meter 100% pe atka hua hai. Neeche se kuch chuno aur isko utaaro.</p>
+
+  <section class="box" aria-label="Gussa meter">
+    <div class="top">
+      <div class="face" id="face" aria-hidden="true">😡</div>
+      <div>
+        <div class="pct">Gussa: <span id="pct">100</span>%</div>
+        <div class="cap" id="cap">Abhi paas mat aana.</div>
+      </div>
+    </div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="barwrap"><div class="fill" id="fill"></div></div>
+    <p class="say" id="say" aria-live="polite">Pehle kuch toh de do…</p>
+  </section>
+
+  <h2>Rishwat counter</h2>
+  <div class="offers" id="offers"></div>
+
+  <h2>Ab toh maaf kar do na?</h2>
+  <div class="choices" id="choices">
+    <button class="yes" id="yes">Haan, kiya 😌</button>
+    <button class="no" id="no">Nahi 😤</button>
+  </div>
+
+  <p class="sign">Tumhara sabse bada gadha dost 🫏</p>
+</main>
+
+<div class="ov" id="ov" hidden>
+  <div class="box">
+    <h2>Maafi manzoor! 🎉</h2>
+    <p>Gussa gaya, dosti wapas. Chalo ab chai meri taraf se ☕</p>
+    <button class="again" id="again">Phir se khelo</button>
+  </div>
+</div>
+
+<script>
+const offers=[
+ ["☕","Ek kadak chai","Chai aa rahi hai. Cheeni kam, drama zyada."],
+ ["🥟","Golgappe (teekha paani)","Paani teekha hai, sorry meetha hai. Dono free."],
+ ["🍫","Chocolate","Dairy Milk le aaya hu. Mera bacha hua ego bhi isi mein hai."],
+ ["😂","Ek meme","Main: sorry. Tum: “hmm”. Main: 💀 Ye meme nahi, meri life hai."],
+ ["🧎","10 uthak-baithak","Kaan pakad ke 10 ho gayi. Ghutne ne bhi sorry bola."]
+];
+const faces={100:"😡",80:"😤",60:"😒",40:"🙂",20:"😏",0:"😄"};
+const caps={100:"Abhi paas mat aana.",80:"Abhi bhi garam hai.",60:"Thoda thanda ho raha hai.",40:"Muskurahat ka shak hai…",20:"Lagbhag maaf kar diya!",0:"Gussa gayab. Mission pura."};
+const dodgeLines=["Nahi? Pakda nahi jayega 😏","Itni jaldi nahi!","Button bhi tumse darta hai 😂","Oye, ruko!","Achha, ab bas karo yaar…"];
+const $=id=>document.getElementById(id);
+let level=100,dodges=0,surrendered=false;
+
+function render(){
+  $("pct").textContent=level;
+  $("fill").style.width=level+"%";
+  $("fill").style.background="hsl("+((100-level)*0.9)+" 80% 48%)";
+  $("barwrap").setAttribute("aria-valuenow",level);
+  $("face").textContent=faces[level];
+  $("cap").textContent=caps[level];
+}
+function say(t){$("say").textContent=t}
+
+const list=$("offers");
+function build(){
+  list.innerHTML="";
+  offers.forEach(o=>{
+    const b=document.createElement("button");
+    b.className="offer";
+    b.innerHTML='<span class="e">'+o[0]+'</span><span>'+o[1]+'</span>';
+    b.addEventListener("click",()=>{
+      b.disabled=true;
+      level=Math.max(0,level-20);
+      say(o[2]);
+      render();
+      if(level===0)say("Gussa 0%! Ab last sawaal neeche hai 👇");
+    });
+    list.appendChild(b);
+  });
+}
+
+const area=$("choices"),no=$("no");
+function dodge(e){
+  if(surrendered||!$("ov").hidden)return;
+  e.preventDefault();
+  dodges++;
+  if(dodges>=6){
+    surrendered=true;
+    no.textContent="Haan, maaf kiya 😇";
+    no.style.position="";no.style.left="";no.style.top="";
+    say("Button thak gaya. Ab tum bhi maan jao 😂");
+    return;
+  }
+  const a=area.getBoundingClientRect(),b=no.getBoundingClientRect();
+  no.style.position="absolute";
+  no.style.left=Math.max(0,Math.random()*(a.width-b.width))+"px";
+  no.style.top=Math.max(0,Math.random()*(a.height-b.height))+"px";
+  say(dodgeLines[Math.min(dodges-1,dodgeLines.length-1)]);
+}
+no.addEventListener("pointerenter",dodge);
+no.addEventListener("pointerdown",dodge);
+no.addEventListener("click",()=>{if(surrendered)win()});
+$("yes").addEventListener("click",win);
+
+function win(){
+  const ov=$("ov");
+  ov.hidden=false;
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const em=["🎉","🥳","☕","🍫","🥟","😂","💖"];
+  for(let i=0;i<28;i++){
+    const s=document.createElement("span");
+    s.className="drop";
+    s.textContent=em[i%em.length];
+    s.style.left=Math.random()*95+"vw";
+    s.style.animationDelay=(Math.random()*1.5)+"s";
+    s.style.animationDuration=(2.5+Math.random()*2)+"s";
+    ov.appendChild(s);
+  }
+}
+$("again").addEventListener("click",()=>{
+  document.querySelectorAll(".drop").forEach(d=>d.remove());
+  $("ov").hidden=true;
+  level=100;dodges=0;surrendered=false;
+  no.textContent="Nahi 😤";
+  no.style.position="";no.style.left="";no.style.top="";
+  say("Pehle kuch toh de do…");
+  build();render();
+});
+build();render();
+</script>
+</body>
+</html>
